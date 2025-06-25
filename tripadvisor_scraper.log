@@ -1,0 +1,2 @@
+2025-06-25 16:38:55,702 - INFO - Chrome driver initialized successfully
+2025-06-25 16:38:55,703 - ERROR - Critical error in scraper: 'NoneType' object is not iterable

@@ -101,18 +101,19 @@ class SioxHotelScraperDownloaderMiddleware:
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
 
-# class ApplyZyteProxyAPIMiddleware:
-#     def process_request(self, request, spider):
-#         proxy = f'http://{os.getenv('ZYTE_SMARTPROXY_APIKEY')}:@api.zyte.com:8011'  # Replace with your Zyte Proxy
-
-#         request.meta['proxy'] = proxy  # Set the proxy in the request meta
+class ApplyZyteProxyAPIMiddleware:
+    def process_request(self, request, spider):
         
-#         if proxy:
-#             spider.logger.info(f"Scraping URL: {request.url} | Using proxy: {proxy}")
-#         else:
-#             spider.logger.info(f"Scraping URL: {request.url} | No proxy used for this request")
+        proxy = f'http://{os.getenv('ZYTE_SMARTPROXY_APIKEY')}:@api.zyte.com:8011'  # Replace with your Zyte Proxy
 
-#         return None  # Pass the request to the next middleware
+        request.meta['proxy'] = proxy  # Set the proxy in the request meta
+        
+        if proxy:
+            spider.logger.info(f"Scraping URL: {request.url} | Using proxy: {proxy}")
+        else:
+            spider.logger.info(f"Scraping URL: {request.url} | No proxy used for this request")
+
+        return None  # Pass the request to the next middleware
 
 
 class ApplyScraperProxyAPIMiddleware:
