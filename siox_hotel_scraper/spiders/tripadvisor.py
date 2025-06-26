@@ -10,24 +10,21 @@ from siox_hotel_scraper.utils.selenium_handler import SeleniumHandler
 class TripadvisorSpider(scrapy.Spider):
     name = "tripadvisor"
     allowed_domains = ["tripadvisor.com"]
-    # start_urls = ["https://www.tripadvisor.com/Hotels-g28931-Georgia-Hotels.html"]
-    # start_urls = ["https://www.tripadvisor.com/Hotel_Review-g60814-d7216821-Reviews-Homewood_Suites_By_Hilton_Savannah_Historic_District_Riverfront-Savannah_Georgia.html"]
-    start_urls = ["https://www.tripadvisor.com/Hotels-g34859-Columbus_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g29212-Augusta_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g60814-Savannah_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g29209-Athens_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g35244-Sandy_Springs_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g35235-Roswell_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g60920-Macon_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g35348-Warner_Robins_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g29196-Alpharetta_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g35091-Marietta_Georgia-Vacations.html",
-        "https://www.tripadvisor.com/Hotels-g35335-Valdosta_Georgia-Vacations.html"]
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     # Set headless=False to see the browser
-    #     self.selenium_handler = SeleniumHandler(headless=False)
+    
+    start_urls = [
+        "https://www.tripadvisor.com/Hotels-g30138-Abilene_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g30165-Amarillo_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g30183-Arlington_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g30196-Austin_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g55711-Dallas_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g55732-Denton_Texas-Hotels.html",
+        "https://www.tripadvisor.com/Hotels-g55857-Fort_Worth_Texas-Vacations.html",    
+    ]
 
+    scrapped_urls = []
+    with open('data/georgia.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        scrapped_urls = [x['hotel_url'] for x in data]
 
 
 
@@ -36,12 +33,15 @@ class TripadvisorSpider(scrapy.Spider):
         hotel_list = response.xpath('//div[@data-automation="hotel-card-title"]//a/@href').getall()
 
         for hotel_link in hotel_list:
-            
-            yield scrapy.Request(
-                response.urljoin(hotel_link),
-                self.parse_hotel,
-                
-            )
+            if response.urljoin(hotel_link) not in self.scrapped_urls:
+                yield scrapy.Request(
+                    response.urljoin(hotel_link),
+                    self.parse_hotel,   
+                )
+            else:
+                print('------------------------')
+                print('Avoiding the link as scrapped once.')
+                print('------------------------')
 
         next_page = response.xpath(
             '//a[@aria-label="Next page"]/@href'
