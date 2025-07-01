@@ -1,0 +1,1 @@
+start_urls = ["https://www.tripadvisor.com/Hotels-g32431-oa30-Glendale_California-Hotels.html"]
