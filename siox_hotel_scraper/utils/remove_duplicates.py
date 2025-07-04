@@ -32,13 +32,22 @@ def remove_duplicates_from_json(input_file, sheet_name=None, output_excel=None):
     data = calculate_distances(data)
 
     # Save to output file (or overwrite input)
-    output_file = input_file
+    # output_file = input_file
+    output_file = 'data/processed_texas.json'
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(unique_data, f, indent=2, ensure_ascii=False)
     print(f"✅ Cleaned JSON saved to: {output_file}")
 
     # Export to Excel
     output_excel = 'data/tripadvisor_hotels_data.xlsx'
+
+    # Define fixed column order
+    fixed_columns = [
+        "hotel_name", "hotel_url", "tripadvisor_id", "address", "city", "state", "zip_code",
+        "region_rank", "overall_rating", "latitude", "longitude", "total_reviews", "number_of_rooms",
+        "Location", "Rooms", "Value", "Cleanliness", "Service", "Sleep Quality",
+        "nearby_hotels", "nearby_hotels_descriptive", "reviews"
+    ]
 
     rows = []
     for entry in data:
@@ -47,17 +56,29 @@ def remove_duplicates_from_json(input_file, sheet_name=None, output_excel=None):
         # Extract city
         state = entry.get('state', '')
 
-        # Format nearby_hotels
-        nearby = entry.get('nearby_hotels', [])
-        row['nearby_hotels'] = '\n'.join(nearby)
-
-        # Create descriptive nearby list
-        row['nearby_hotels_descriptive'] = '\n'.join([f"{hotel}, {state}" for hotel in nearby])
+        for col in fixed_columns:
+            if col == "nearby_hotels":
+                row[col] = '\n'.join(entry.get("nearby_hotels", []))
+            elif col == "nearby_hotels_descriptive":
+                state = entry.get("state", "")
+                row[col] = '\n'.join([f"{hotel}, {state}" for hotel in entry.get("nearby_hotels", [])])
+            elif col == "reviews":
+                reviews = entry.get("reviews", [])
+                formatted_reviews = []
+                for review in reviews:
+                    review_text = review.get("text", "").strip().replace("\n", " ")
+                    response_text = review.get("mgmt_response", "None")
+                    if isinstance(response_text, dict):
+                        response_text = response_text.get("text", "").strip().replace("\n", " ")
+                    formatted_reviews.append(f"Review: {review_text}\nResponse: {response_text}")
+                row[col] = "\n\n".join(formatted_reviews)
+            else:
+                row[col] = entry.get(col, "")
 
         rows.append(row)
 
     # Create DataFrame
-    df = pd.DataFrame(rows)
+    df = pd.DataFrame(rows, columns=fixed_columns)
 
     if os.path.exists(output_excel):
         # Load existing workbook and append a new sheet
@@ -72,4 +93,4 @@ def remove_duplicates_from_json(input_file, sheet_name=None, output_excel=None):
 
 # Example usage:
 if __name__ == "__main__":
-    remove_duplicates_from_json('data/texas.json', 'Texas')  # Replace with your actual filename
+    remove_duplicates_from_json('data/texas2.json', 'Texas')  # Replace with your actual filename

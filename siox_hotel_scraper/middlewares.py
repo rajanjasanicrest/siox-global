@@ -101,6 +101,7 @@ class SioxHotelScraperDownloaderMiddleware:
     def spider_opened(self, spider):
         spider.logger.info("Spider opened: %s" % spider.name)
 
+
 class ApplyZyteProxyAPIMiddleware:
     def process_request(self, request, spider):
         
@@ -116,10 +117,10 @@ class ApplyZyteProxyAPIMiddleware:
         return None  # Pass the request to the next middleware
 
 
-class ApplyScraperProxyAPIMiddleware:
-    def process_request(self, request, spider):
-        api_key = os.getenv("SCRAPER_API_KEY")
-        proxy = f"http://scraperapi:{api_key}@proxy-server.scraperapi.com:8001"
-        request.meta['proxy'] = proxy
-        spider.logger.info(f"Scraping {request.url} using ScraperAPI proxy")
-        return None
+# class ApplyScraperProxyAPIMiddleware:
+#     def process_request(self, request, spider):
+#         api_key = os.getenv("SCRAPER_API_KEY")
+#         proxy = f"http://scraperapi:{api_key}@proxy-server.scraperapi.com:8001"
+#         request.meta['proxy'] = proxy
+#         spider.logger.info(f"Scraping {request.url} using ScraperAPI proxy")
+#         return None
